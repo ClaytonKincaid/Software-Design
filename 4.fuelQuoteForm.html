@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Quote</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Fuel Quote Form</h2>
+        <form id="quoteForm">
+            <label for="gallonsRequested">Gallons Requested:</label>
+            <input type="number" id="gallonsRequested" name="gallonsRequested" required>
+            <label for="deliveryDate">Delivery Date:</label>
+            <input type="date" id="deliveryDate" name="deliveryDate" required>
+            <label for="suggestedPrice">Suggested Price / gallon:</label>
+            <input type="number" id="suggestedPrice" name="suggestedPrice" readonly>
+            <label for="totalAmountDue">Total Amount Due:</label>
+            <input type="number" id="totalAmountDue" name="totalAmountDue" readonly>
+            <button type="submit">Submit Quote</button>
+        </form>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
