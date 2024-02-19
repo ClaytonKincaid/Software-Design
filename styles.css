@@ -85,3 +85,40 @@ a:hover {
     text-decoration: underline;
 }
 
+.homeButton {
+    margin-bottom: 20px;
+}
+
+.backButton {
+    margin: 0px;
+    padding: 0px;
+    color: #4CAF50;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.backButton::before {
+    content: '←';
+    font-size: 30px;
+}
+
+.pageTitle {
+    margin-top: 0px;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 0;
+    text-align: center;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    padding: 0 10px;
+}
+
+header a:hover {
+    text-decoration: underline;
+}
