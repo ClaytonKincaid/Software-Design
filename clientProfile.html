@@ -8,15 +8,15 @@
 </head>
 <body>
     <header>
-        <a href="6.home.html">Home</a>
-        <a href="4.fuelQuoteForm.html">Quote</a>
-        <a href="5.fuelQuoteHistoryPage.html">History</a>
-        <a href="3.clientProfilePage.html">Profile</a>
-        <a href="5.fuelQuoteHistoryPage.html">Logout</a>
+        <a href="home.html">Home</a>
+        <a href="fuelQuoteForm.html">Quote</a>
+        <a href="fuelQuoteHistory.html">History</a>
+        <a href="clientProfile.html">Profile</a>
+        <a href="fuelQuoteHistory.html">Logout</a>
     </header>
 
     <div class="container">
-        <a href="6.home.html" class="backButton"></a>
+        <a href="home.html" class="backButton"></a>
         <h2 class="pageTitle">Client Profile</h2>
         <form id="profileForm">
             <label for="fullName">Full Name:</label>
@@ -37,7 +37,29 @@
             <button type="submit">Save Profile</button>
         </form>
     </div>
-    <script src="script.js"></script>
+    <script>
+        document.getElementById('profileForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            fetch('/clientProfile', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response error');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Update successful:', data);
+                window.location.href = 'home.html';
+            })
+            .catch(error => {
+                console.error('Update failed:', error);
+            });
+        });
+    </script>
 </body>
 </html>
 
