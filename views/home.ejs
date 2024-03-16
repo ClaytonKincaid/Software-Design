@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <a href="/">Home</a>
+        <a href="quote">Quote</a>
+        <a href="history">History</a>
+        <a href="profile">Profile</a>
+        <!-- <a href="login">Logout</a> -->
+        <!-- <form action="/logout?_method=DELETE" method="POST" class="logoutForm">
+            <button type="submit" class="homeButton">Logout</button>
+        </form> -->
+        <form action="/logout?_method=DELETE" method="POST">
+            <button type="submit" class="logoutButton">Logout</button>
+        </form>
+    </header>
+
+    <div class="container">
+        <h2>Home</h2>
+        <a href="quote">
+            <button class="homeButton">Fuel Quote Form</button>
+        </a>
+        <a href="history">
+            <button class="homeButton">History</button>
+        </a>
+        <a href="profile">
+            <button class="homeButton">Update Profile</button>
+        </a>
+        <!-- <a href="login">
+            <button class="homeButton">Logout</button>
+        </a> -->
+        <form action="/logout?_method=DELETE" method="POST">
+            <button type="submit" class="logoutButton">Logout</button>
+        </form>
+    </div>
+</body>
+</html>
+

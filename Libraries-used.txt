@@ -1,0 +1,52 @@
+1. 
+Start project with npm init -y
+
+2. 
+download express with npm i express
+
+3. 
+download npm i --save-dev nodemon so that we can easily restart server after making changes and can do it automatically
+
+4.
+In the packages.json create in the "scripts" this line
+"devStart": "nodemon server.js"
+and remove this line 
+// "test": "echo \"Error: no test specified\" && exit 1"
+
+5.
+create server.js file
+
+6.
+start with 
+npm run devStart
+so that it can restart server after making changes
+
+7.
+npm i ejs
+this is for our view engine
+
+
+8. on vs code install ejs language support extension
+
+
+9. For login module, install dependencies npm i --save-dev nodemon dotenv
+nodemon to restart server easier and dotenv to have environment variables in the .env variables to store in the server
+
+10. hash our users password -> use bcrypt
+npm i bcrypt
+allows to hash passwords and to compare hashed passwords
+
+11. 
+install passport library
+npm i passport passport-local express-session express-flash
+this allows us to local version allows to use username and password to login, passport has others way to login like through google, facebook etc
+express-session allows to store and persist user across different pages
+express-flash is used by passport to display nice handy messages for wrong email, wrong password etc
+
+12.
+install library so that delete method works for logging out
+npm i method-override
+allows to override method instead of using post but call delete
+
+
+

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Quote</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Make sure the path to the CSS is correct -->
+</head>
+<body>
+    <header>
+        <a href="/">Home</a>
+        <a href="/quote">Quote</a> <!-- Make sure these links are absolute paths -->
+        <a href="/history">History</a>
+        <a href="/profile">Profile</a>
+        <a href="/login">Logout</a>
+    </header>
+
+    <div class="container">
+        <h2 class="pageTitle">Fuel Quote Form</h2>
+        <form id="quoteForm" action="/quote" method="post">
+            <label for="gallonsRequested">Gallons Requested:</label>
+            <input type="number" id="gallonsRequested" name="gallonsRequested" value="<%= gallonsRequested %>" required>
+            
+            <label for="deliveryDate">Delivery Date:</label>
+            <input type="date" id="deliveryDate" name="deliveryDate" value="<%= deliveryDate %>" required>
+            
+            <label for="suggestedPrice">Suggested Price / gallon:</label>
+            <input type="text" id="suggestedPrice" name="suggestedPrice" value="<%= suggestedPrice %>" readonly>
+            
+            <label for="totalAmountDue">Total Amount Due:</label>
+            <input type="text" id="totalAmountDue" name="totalAmountDue" value="<%= totalAmountDue %>" readonly>
+            
+            <button type="submit">Get Quote</button>
+        </form>
+        
+        <!-- Confirmation Form, visible after price calculation -->
+        <% if (suggestedPrice && totalAmountDue) { %>
+            <form id="confirmForm" action="/quote/confirm-quote" method="post">
+                <input type="hidden" name="gallonsRequested" value="<%= gallonsRequested %>">
+                <input type="hidden" name="deliveryDate" value="<%= deliveryDate %>">
+                <input type="hidden" name="suggestedPrice" value="<%= suggestedPrice %>">
+                <input type="hidden" name="totalAmountDue" value="<%= totalAmountDue %>">
+                <button type="submit">Confirm Quote</button>
+            </form>
+        <% } %>
+    </div>
+</body>
+</html>

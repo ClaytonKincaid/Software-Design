@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Confirmation</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Make sure the path to the CSS is correct -->
+</head>
+<body>
+    <header>
+        <a href="/">Home</a>
+        <a href="/quote">Quote</a>
+        <a href="/history">History</a>
+        <a href="/profile">Profile</a>
+        <a href="/login">Logout</a>
+    </header>
+
+    <div class="container">
+        <h2 class="pageTitle">Quote Confirmation</h2>
+        <p>Thank you for your request. Here are the details of your fuel quote:</p>
+        
+        <div class="quote-details">
+            <p><strong>Gallons Requested:</strong> <%= gallonsRequested %></p>
+            <p><strong>Delivery Date:</strong> <%= deliveryDate %></p>
+            <p><strong>Suggested Price / gallon:</strong> $<%= suggestedPrice %></p>
+            <p><strong>Total Amount Due:</strong> $<%= totalAmountDue %></p>
+        </div>
+
+        <!-- No action needed here, just information display and a button to go back to the home page or wherever appropriate -->
+        <a href="/" class="button">Home</a>
+    </div>
+</body>
+</html>
