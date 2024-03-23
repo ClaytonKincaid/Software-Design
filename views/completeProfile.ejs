@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Profile</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <header>
         <a href="/">Home</a>
-        <a href="quote">Quote</a>
-        <a href="history">History</a>
-        <a href="profile">Profile</a>
-        <a href="login">Logout</a>
+        <a href="/quote">Quote</a>
+        <a href="/history">History</a>
+        <a href="/profile">Profile</a>
+        <a href="/login">Logout</a>
     </header>
 
     <div class="container">
         <h2 class="pageTitle">Client Profile</h2>
         <!-- Update the form's action attribute to POST data to the /profile route -->
-        <form id="profileForm" action="/profile" method="post">
+        <form id="completeProfile" action="/complete-profile" method="post">
             <label for="fullName">Full Name:</label>
             <input type="text" id="fullName" name="fullName" value="<%= userProfile.fullName %>" maxlength="50" required>
             
@@ -33,16 +33,8 @@
             
             <label for="state">State:</label>
             <select id="state" name="state" required>
-                <% if (userProfile.state) { %>
-                    <option value="<%= userProfile.state %>"><%= userProfile.state %></option>
-                <% } else { %>
-                    <option value="">Select State</option>
-                <% } %>
-                <% stateCodes.forEach(function(code) { 
-                    if (code !== userProfile.state) { %>
-                        <option value="<%= code %>"><%= code %></option>
-                <%  }
-                }); %>
+                <option value="">Select State</option>
+                <!-- ... State options ... -->
             </select>
             
             <label for="zipcode">Zipcode:</label>
@@ -60,30 +52,19 @@
             'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
             'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
         ];
-        // const stateSelect = document.getElementById('state');
-        // stateCodes.forEach(code => {
-        //     const option = document.createElement('option');
-        //     option.value = code;
-        //     option.textContent = code;
-        //     stateSelect.appendChild(option);
-        // });
-        const selectedState = "<% userProfile.state %>"
-        const stateSelect = document.getElementById('state')
+        const stateSelect = document.getElementById('state');
         stateCodes.forEach(code => {
-            const option = document.createElement('option')
-            option.value = code
-            option.textContent = code
-            if (code === selectedState) {
-                option.selected = true
-            }
-            stateSelect.appendChild(option)
-        })
+            const option = document.createElement('option');
+            option.value = code;
+            option.textContent = code;
+            stateSelect.appendChild(option);
+        });
 
-        // // Verify updated profile information when submitted
-        // document.getElementById('profileForm').addEventListener('submit', function(event) {
+        // Verify updated profile information when submitted
+        // document.getElementById('completeProfile').addEventListener('submit', function(event) {
         //     event.preventDefault();
         //     const formData = new FormData(event.target);
-        //     fetch('/clientProfile', {
+        //     fetch('/complete-profile', {
         //         method: 'POST',
         //         body: formData
         //     })

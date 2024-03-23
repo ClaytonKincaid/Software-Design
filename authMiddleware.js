@@ -15,4 +15,20 @@ function checkNotAuthenticated(req, res, next) {
     next()
 }
 
-module.exports = { checkAuthenticated, checkNotAuthenticated };
+
+// New middleware function to ensure profile completion
+function checkProfileComplete(req, res, next) {
+    if (req.isAuthenticated()) {
+        // Assuming req.user contains the user object and profileComplete is a property
+        if (!req.user.profileComplete) {
+            // Redirect to complete-profile if the profile is not complete
+            return res.redirect('/complete-profile')
+        }
+        return next()
+    }
+    // If not authenticated, redirect to login
+    return res.redirect('/login')
+}
+
+// Export the additional middleware
+module.exports = { checkAuthenticated, checkNotAuthenticated, checkProfileComplete }

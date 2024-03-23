@@ -34,7 +34,7 @@ initializePassport(
 app.set('view engine', 'ejs') // Sets EJS as the template engine for rendering views
 
 // Serve static files from the `css` and `views` directories
-app.use(express.static('views'));
+app.use(express.static('public'));
 
 app.use(express.urlencoded({ extended: true})) // code to access body coming from forms
 app.use(flash()) // Use flash middleware for displaying flash messages stored in session
@@ -95,6 +95,9 @@ app.use('/register', registerRouter)
 
 const profileRouter = require('./routes/profile') // Client profile page
 app.use('/profile', profileRouter)
+
+const completeprofileRouter = require('./routes/complete-profile') // Client profile page
+app.use('/complete-profile', completeprofileRouter)
 
 // Not used since replaced by fuelQuoteRoutes
 // const quoteRouter = require('./routes/quote') // Fuel Quote form page

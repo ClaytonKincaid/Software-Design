@@ -1,9 +1,9 @@
 // Fuel Quote History module
 const express = require('express')
 const router = express.Router()
-const { checkAuthenticated } = require('../authMiddleware')
+const { checkAuthenticated, checkProfileComplete } = require('../authMiddleware')
 
-router.get("/", checkAuthenticated, (req, res) => {
+router.get("/", checkAuthenticated, checkProfileComplete, (req, res) => {
     res.render("fuelQuoteHistory")
 })
 

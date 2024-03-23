@@ -2,6 +2,17 @@
 
 # Updates:
 
+-March 22 2024
+Updated required to make profile before accessing other pages
+
+Split profile into profile.js for updating profiles and complete-profile.js for initial profile completion
+
+Profile page update to reflect current saved profile
+
+Moved css to public folder
+
+
+
 -March 16 2024
 Uploaded backend code
 

@@ -1,7 +1,7 @@
 // Route definitions related to fuel quote functionality
 const express = require('express')
 const router = express.Router()
-const { checkAuthenticated } = require('../authMiddleware')
+const { checkAuthenticated, checkProfileComplete } = require('../authMiddleware')
 
 const PricingModule = require('../PricingModule') // single dot represents current dir and two dots represents parent dir
 // const { route } = require('./routes/users')
@@ -9,7 +9,7 @@ const PricingModule = require('../PricingModule') // single dot represents curre
 const pricingModule = new PricingModule()
 
 // Route to display the fuel quote form
-router.get('/', checkAuthenticated, (req, res) => {
+router.get('/', checkAuthenticated, checkProfileComplete, (req, res) => {
     res.render('fuelQuoteForm', {
         gallonsRequested: '',
         deliveryDate: '',
@@ -19,7 +19,7 @@ router.get('/', checkAuthenticated, (req, res) => {
 })
 
 // Route to handle the form submission
-router.post('/', checkAuthenticated, (req, res) => {
+router.post('/', checkAuthenticated, checkProfileComplete, (req, res) => {
     const {gallonsRequested, deliveryDate} = req.body
     // Assumed
     const quoteDetails = {
@@ -42,7 +42,7 @@ router.post('/', checkAuthenticated, (req, res) => {
 
 
 // Route to handle the confirmation of the quote
-router.post('/confirm-quote', checkAuthenticated, (req, res) => {
+router.post('/confirm-quote', checkAuthenticated, checkProfileComplete, (req, res) => {
     const { gallonsRequested, deliveryDate, suggestedPrice, totalAmountDue } = req.body;
 
     // Here you would typically store the confirmed quote in a database
