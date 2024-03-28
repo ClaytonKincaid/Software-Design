@@ -30,13 +30,7 @@ Added comments to unused files
 
 # Issues:
 
-Logout buttons have mismatched style
-
-Logout buttons not connected on other pages
-
 !DOCTYPE html> displayed on '/profile'
-
-Add registration errors to registration page if user exists already
 
 
 # Explained:
