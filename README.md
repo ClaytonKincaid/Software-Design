@@ -1,7 +1,7 @@
 # Software-Design-Temp
 
 # Updates:
-- March 28 2024
+-March 28 2024
 Fix logout button to make its style and functionality consistent across pages
 
 Add error message when user tries to create an account with a username that already exists
