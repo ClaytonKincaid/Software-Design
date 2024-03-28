@@ -9,16 +9,18 @@
 <body>
     <header>
         <a href="/">Home</a>
-        <a href="quote">Quote</a>
-        <a href="history">History</a>
-        <a href="profile">Profile</a>
-        <!-- <a href="login">Logout</a> -->
-        <!-- <form action="/logout?_method=DELETE" method="POST" class="logoutForm">
-            <button type="submit" class="homeButton">Logout</button>
-        </form> -->
-        <form action="/logout?_method=DELETE" method="POST">
-            <button type="submit" class="logoutButton">Logout</button>
-        </form>
+        <a href="/quote">Quote</a>
+        <a href="/history">History</a>
+        <a href="/profile">Profile</a>
+        <a href="#" id="logoutLink">Logout</a>
+
+        <form action="/logout?_method=DELETE" method="POST"></form>
+        <script>
+            document.getElementById('logoutLink').addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelector('form[action="/logout?_method=DELETE"]').submit();
+            });
+        </script>
     </header>
 
     <div class="container">

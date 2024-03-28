@@ -35,6 +35,7 @@ router.post('/', checkNotAuthenticated, async (req, res) => {
         if (user) {
             // user already exists
             console.log(`Registration attempt failed: User ${req.body.username} already exists.`);
+            req.flash('error', `Registration attempt failed: User ${req.body.username} already exists.`)
             return res.redirect('/register')
         }
 

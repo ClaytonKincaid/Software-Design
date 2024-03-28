@@ -9,6 +9,10 @@
 <body>
     <div class="container">
         <h2>Client Registration</h2>
+        <!-- Display error message from Flash if it exists -->
+        <% if (messages.error) { %>
+            <div class="error-message"><%= messages.error %></div>
+        <% } %>
         <!-- Add method="POST" and action="/register" to ensure proper form submission -->
         <form id="registrationForm" action="/register" method="post">
             <label for="username">Username:</label>
