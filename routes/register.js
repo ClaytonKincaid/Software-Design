@@ -5,7 +5,7 @@ const router = express.Router()
 
 const bcrypt = require('bcrypt') // for hashing passwords
 const userData = require('../userData') // grabs in memory database
-const { checkNotAuthenticated } = require('../authMiddleware');
+const { checkNotAuthenticated, validateRegistration} = require('../authMiddleware');
 
 
 router.get("/", checkNotAuthenticated, (req, res) => {
@@ -28,7 +28,7 @@ router.get("/", checkNotAuthenticated, (req, res) => {
 //     console.log(users)
 // })
 
-router.post('/', checkNotAuthenticated, async (req, res) => {
+router.post('/', checkNotAuthenticated, validateRegistration, async (req, res) => {
     try {
         // check if user already exists
         const user = userData.findUserByUsername(req.body.username)

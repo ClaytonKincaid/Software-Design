@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { checkAuthenticated, checkProfileComplete } = require('../authMiddleware')
+const { checkAuthenticated, checkProfileComplete, validateProfileInfo } = require('../authMiddleware')
 const userData = require('../userData')
 
 // Example data store for the user profile
@@ -24,7 +24,7 @@ router.get("/", checkAuthenticated, (req, res) => {
 })
 
 
-router.post("/", checkAuthenticated, (req, res) => {
+router.post("/", checkAuthenticated, validateProfileInfo, (req, res) => {
     const { fullName, address1, address2, city, state, zipcode } = req.body
     const userId = req.user.id; // Assuming req.user.id is available and correctly populated
 

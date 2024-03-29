@@ -111,7 +111,9 @@ app.use('/history', historyRouter)
 // Include login module, client profile management module, fuel quote module, pricing module
 
 // makes server actually run with port number
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
   });
 
+
+module.exports = server;

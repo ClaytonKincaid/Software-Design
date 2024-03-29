@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { checkAuthenticated, checkProfileComplete } = require('../authMiddleware')
+const { checkAuthenticated, checkProfileComplete, validateProfileInfo } = require('../authMiddleware')
 const userData = require('../userData')
 
 const stateCodes = [
@@ -39,7 +39,7 @@ router.get("/", checkAuthenticated, checkProfileComplete, (req, res) => {
 
 
 // Route to handle updating the profile via POST request
-router.post("/", checkAuthenticated, checkProfileComplete, (req, res) => {
+router.post("/", checkAuthenticated, checkProfileComplete, validateProfileInfo, (req, res) => {
     const { fullName, address1, address2, city, state, zipcode } = req.body
     const userId = req.user.id; // Assuming req.user.id is available and correctly populated
 
