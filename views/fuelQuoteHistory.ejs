@@ -24,8 +24,7 @@
     </header>
 
     <div class="container">
-        <a href="/" class="backButton"></a>
-        <h2 class="pageTitle">Fuel Quote History</h2>
+        <!-- Container content -->
         <table id="quoteHistoryTable">
             <thead>
                 <tr>
@@ -37,7 +36,15 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Data will be populated dynamically after we setup the backend and databases in the next assignments -->
+                <% historyData.forEach(item => { %>
+                    <tr>
+                        <td><%= item.gallonsRequested %></td>
+                        <td><%= item.deliveryAddress %></td>
+                        <td><%= item.deliveryDate %></td>
+                        <td><%= item.suggestedPrice %></td>
+                        <td><%= item.quote %></td>
+                    </tr>
+                <% }); %>
             </tbody>
         </table>
     </div>
