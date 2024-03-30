@@ -1,6 +1,9 @@
 # Software-Design-Temp
 
 # Updates:
+-March 29 2024
+Add unit tests for all endpoints
+
 -March 28 2024
 Fix logout button to make its style and functionality consistent across pages
 
