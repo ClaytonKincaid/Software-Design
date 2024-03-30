@@ -22,6 +22,7 @@ router.get("/", checkNotAuthenticated, (req, res) => {
 //     failureFlash: true,
 // }))
 
+  
 router.post('/', checkNotAuthenticated, (req, res, next) => {
     passport.authenticate('local', (error, user, info) => {
         if (error) { return next(error) }

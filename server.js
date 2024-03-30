@@ -10,6 +10,10 @@ const express = require('express') // require express library
 const app = express() // create an instance of express application
 const port = 4000; // port number for server
 
+const bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 
 // Importing the necessary modules for the application
 const bcrypt = require('bcrypt') // for hashing passwords and comparing hashed passwords
