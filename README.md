@@ -40,7 +40,7 @@ Added comments to unused files
 
 ***Any file with _1 is usually a copy made to use if modifications dont work out.
 
-To run add .env file in root folder with SESSION_SECRET=<someKey>
+To run add .env file in root folder with SESSION_SECRET=someKey
 
 -Libraries-used.txt
 
