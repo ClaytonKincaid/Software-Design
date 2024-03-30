@@ -35,15 +35,12 @@ Fixed fuelQuoteRoutes routing style error
 
 Added comments to unused files
 
-# Issues:
-
-!DOCTYPE html> displayed on '/profile'
-
 
 # Explained:
 
 ***Any file with _1 is usually a copy made to use if modifications dont work out.
 
+To run add .env file in root folder with SESSION_SECRET=<someKey>
 
 -Libraries-used.txt
 
