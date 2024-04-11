@@ -1,50 +1,120 @@
-let users = [] // Acts as simple in-memory database since we are not implementing it yet
+const pool = require('./mysqlConnection');
 
-const getUsers = () => users;
-
-const addUser = (user) => {
-    // users.push(user)
-    users.push({...user, profileComplete: false}) // profileComplete field set to false by default when a new user is registered
+async function getUsers() {
+  try {
+    const [rows] = await pool.query('SELECT * FROM AccountData');
+    return rows;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
 }
 
-const findUserByUsername = (username) => {
-    return users.find(user => user.username === username)
+async function addUser(user) {
+  try {
+    await pool.query('INSERT INTO AccountData (Username, PasswordHash) VALUES (?, ?)', [user.username, user.password]);
+  } catch (error) {
+    console.error('Error adding user:', error);
+    throw error;
+  }
 }
 
-const findUserById = (id) => {
-    return users.find(user => user.id === id)
+async function findUserByUsername(username) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM AccountData WHERE Username = ?', [username]);
+    if (rows.length > 0) {
+      // create user object
+      const user = {
+          id: rows[0].UserID,
+          username: rows[0].Username,
+          password: rows[0].PasswordHash,
+          profileComplete: rows[0].ProfileComplete
+      };
+      
+      return user;
+      } else {
+        return null;
+      }
+  } catch (error) {
+    console.error('Error finding user by username:', error);
+    throw error;
+  }
 }
 
-// // Adds a function to mark a user's profile as complete
-// const setUserProfileComplete = (id) => {
-//     const userIndex = users.findIndex(user => user.id === id)
-//     if (userIndex !== -1) {
-//         users[userIndex].profileComplete = true
-//     }
-// }
+async function findUserById(id) {
+  try {
+    const [rows] = await pool.query('SELECT * FROM AccountData WHERE UserID = ?', [id]);
+    if (rows.length > 0) {
+      // create user object
+      const user = {
+        id: rows[0].UserID,
+        username: rows[0].Username,
+        password: rows[0].PasswordHash,
+        profileComplete: rows[0].ProfileComplete
+      };
+    
+      return user;
+      } else {
+        return null;
+      }
+  } catch (error) {
+    console.error('Error finding user by ID:', error);
+    throw error;
+  }
+}
 
+async function setUserProfileComplete(id, { fullName, address1, address2, city, state, zipcode }) {
+  try {
+    // Retrieve the existing profile for the user
+    const [rows] = await pool.query('SELECT * FROM ClientProfile WHERE UserID = ?', [id]);
 
-const setUserProfileComplete = (id, { fullName, address1, address2, city, state, zipcode }) => {
-    const userIndex = users.findIndex(user => user.id === id)
-    if (userIndex !== -1) {
-        // Update the user's profile information along with setting the profileComplete flag
-        users[userIndex] = {
-            ...users[userIndex],
-            fullName,
-            address1,
-            address2,
-            city,
-            state,
-            zipcode,
-            profileComplete: true
-        }
+    if (rows.length === 0) {
+      // Insert a new profile for the user
+      await pool.query('INSERT INTO ClientProfile (UserID, FullName, Address1, Address2, City, State, ZipCode) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, fullName, address1, address2, city, state, zipcode]);
+      // Set profile to complete in AccountData
+      await pool.query('UPDATE AccountData SET ProfileComplete = true WHERE UserID = ?', [id])
+    } else {
+      // Update the existing profile
+      await pool.query('UPDATE ClientProfile SET FullName = ?, Address1 = ?, Address2 = ?, City = ?, State = ?, ZipCode = ? WHERE UserID = ?', [fullName, address1, address2, city, state, zipcode, id]);
     }
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    throw error;
+  }
+}
+
+async function getProfileDataById(id) {
+  try {
+    // Query the database to fetch profile data based on the provided user ID
+    const [rows] = await pool.query('SELECT * FROM ClientProfile WHERE UserID = ?', [id]);
+
+    // Check if profile data exists for the user
+    if (rows.length > 0) {
+      const profileData = {
+        fullName: rows[0].FullName,
+        address1: rows[0].Address1,
+        address2: rows[0].Address2,
+        city: rows[0].City,
+        state: rows[0].State,
+        zipcode: rows[0].Zipcode
+      };
+
+      return profileData;
+    } else {
+      return null; // Return null if no profile data is found for the user
+    }
+  } catch (error) {
+    console.error('Error fetching profile data by ID:', error);
+    throw error;
+  }
 }
 
 module.exports = {
-    getUsers,
-    addUser,
-    findUserByUsername,
-    findUserById,
-    setUserProfileComplete, // Export this function
-}
+  getUsers,
+  addUser,
+  findUserByUsername,
+  findUserById,
+  setUserProfileComplete,
+  getProfileDataById
+};
+

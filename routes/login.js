@@ -4,7 +4,7 @@ const express = require('express')
 const router = express.Router()
 
 const passport = require('passport'); // Add this line to require passport
-const { checkNotAuthenticated, checkProfileComplete } = require('../authMiddleware')
+const { checkNotAuthenticated} = require('../authMiddleware')
 
 // const bcrypt = require('bcrypt');
 const userData = require('../userData'); // Adjust the path as necessary
@@ -25,7 +25,9 @@ router.get("/", checkNotAuthenticated, (req, res) => {
   
 router.post('/', checkNotAuthenticated, (req, res, next) => {
     passport.authenticate('local', (error, user, info) => {
-        if (error) { return next(error) }
+        if (error) { 
+            return next(error) 
+        }
         if (!user) { 
             // Use flash messages to display any authentication errors
             req.flash('error', info.message)
@@ -34,6 +36,8 @@ router.post('/', checkNotAuthenticated, (req, res, next) => {
         req.logIn(user, (error) => {
             if (error) { return next(error) }
             // Check if profile is complete, redirect accordingly
+            console.log("login check profile copmlete");
+            console.log(user.profileComplete);
             if (user.profileComplete) {
                 return res.redirect('/') // Redirect to home/dashboard if profile is complete
             } else {

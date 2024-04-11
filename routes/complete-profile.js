@@ -24,26 +24,31 @@ router.get("/", checkAuthenticated, (req, res) => {
 })
 
 
-router.post("/", checkAuthenticated, validateProfileInfo, (req, res) => {
-    const { fullName, address1, address2, city, state, zipcode } = req.body
-    const userId = req.user.id; // Assuming req.user.id is available and correctly populated
+router.post("/", checkAuthenticated, validateProfileInfo, async (req, res) => {
+    const { fullName, address1, address2, city, state, zipcode } = req.body;
+    const userId = req.user.id;
 
-    // Update call to setUserProfileComplete to include profile details
-    userData.setUserProfileComplete(userId, { fullName, address1, address2, city, state, zipcode })
+    try {
+        // Update call to setUserProfileComplete to include profile details
+        await userData.setUserProfileComplete(userId, { fullName, address1, address2, city, state, zipcode });
 
-    console.log('Profile completed:', req.user.username)
-    // Log the completed profile details to the console
-    console.log('Profile completed for:', req.user.username)
-    console.log('Full Name:', fullName)
-    console.log('Address 1:', address1)
-    console.log('Address 2:', address2)
-    console.log('City:', city)
-    console.log('State:', state)
-    console.log('Zipcode:', zipcode)
-    console.log()
-    
-    res.redirect('/profile'); // Redirect to home or dashboard after profile completion
-})
+        console.log('Profile completed:', req.user.username);
+        // Log the completed profile details to the console
+        console.log('Profile completed for:', req.user.username);
+        console.log('Full Name:', fullName);
+        console.log('Address 1:', address1);
+        console.log('Address 2:', address2);
+        console.log('City:', city);
+        console.log('State:', state);
+        console.log('Zipcode:', zipcode);
+        console.log();
+        
+        res.redirect('/'); // Redirect to home after profile completion
+    } catch (error) {
+        console.error('Error completing profile:', error);
+        res.redirect('/error'); // Redirect to an error page if an error occurs
+    }
+});
 
 // Export the router to be mounted in the main application file
 module.exports = router

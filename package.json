@@ -1,10 +1,11 @@
 {
   "name": "fuelapp",
   "version": "1.0.0",
-  "description": "",
+  "description": "-March 29 2024\r Add unit tests for all endpoints",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon server.js"
+    "devStart": "nodemon server.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -12,10 +13,11 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "ejs": "^3.1.9",
-    "express": "^4.18.3",
+    "express": "^4.19.2",
     "express-flash": "^0.0.2",
     "express-session": "^1.18.0",
     "method-override": "^3.0.0",
+    "mysql2": "^3.9.4",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0"
   },
