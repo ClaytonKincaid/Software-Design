@@ -6,8 +6,9 @@ Integrated MySQL for backend.
 
 Steps to setup:
 1. Install MySQL  
-2. Install mysql2 node package by using: npm install mysql2  
-3. Create .env text file in root directory if you don't already have one  
+2. Install mysql2 node package by using: npm install mysql2
+3. Run the queries in database.sql to create the database and setup the tables  
+4. Create .env text file in root directory if you don't already have one  
    Your .env file should have the following:  
    SESSION_SECRET=<your_secret>  
    MYSQL_HOST=<your_host>            ('localhost' should work fine)  
