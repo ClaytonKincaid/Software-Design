@@ -1,0 +1,6 @@
+SESSION_SECRET = 'someKey'
+
+MYSQL_HOST = '127.0.0.1'
+MYSQL_USER = 'root'
+MYSQL_PASSWORD = '4353' # Password shared for for demo purposes on how the file should be structured to replicate the project
+MYSQL_DATABASE = 'main'

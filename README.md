@@ -1,10 +1,11 @@
 # Software-Design-Temp
 
-# Updates:
--April 11 2024
-Integrated MySQL for backend.
+# How to run
+- Add .env file, look at env_example.txt file for example env file
+- Perform npm install to download all project dependencies
+- Perform necessary steps to get the database going
 
-Steps to setup:
+Steps to setup DB:
 1. Install MySQL  
 2. Install mysql2 node package by using: npm install mysql2
 3. Run the queries in database.sql to create the database and setup the tables  
@@ -15,6 +16,16 @@ Steps to setup:
    MYSQL_USER=<your_username>        ('root' should work fine)  
    MYSQL_PASSWORD=<your_password>  
    MYSQL_DATABASE='main'  
+
+- run npm run devStart 
+
+# Updates:
+
+- April 12 2024
+Added how to run section in README
+
+-April 11 2024
+Integrated MySQL for backend.
 
 -March 29 2024
 Add unit tests for all endpoints
