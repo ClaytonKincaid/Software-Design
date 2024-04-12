@@ -6,8 +6,8 @@ class PricingModule {
 
     calculatePrice(quoteDetails) {
         const basePrice = 1.50 // Price used for testing
-        const {quantity} = quoteDetails
-        const totalPrice = quantity * basePrice // Calculate gallons * price from Assignement 2
+        const {gallonsRequested} = quoteDetails
+        const totalPrice = gallonsRequested * basePrice // Calculate gallons * price from Assignement 2
         return totalPrice
     }
 

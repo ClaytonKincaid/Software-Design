@@ -16,7 +16,7 @@ function checkNotAuthenticated(req, res, next) {
 }
 
 
-// New middleware function to ensure profile completion
+// Middleware function to ensure profile completion
 function checkProfileComplete(req, res, next) {
     if (req.isAuthenticated()) {
         // Assuming req.user contains the user object and profileComplete is a property
