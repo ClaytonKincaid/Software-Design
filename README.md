@@ -22,6 +22,9 @@ Steps to setup DB:
 # Updates:
 
 - April 12 2024
+Added unit testing the database queries in userData.js 
+
+- April 12 2024
 Added how to run section in README
 
 -April 11 2024

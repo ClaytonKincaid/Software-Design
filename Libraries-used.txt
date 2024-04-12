@@ -49,4 +49,7 @@ npm i method-override
 allows to override method instead of using post but call delete
 
 
+13.
+download jest for unit testing in development environment
+npm i --save-dev jest
 
