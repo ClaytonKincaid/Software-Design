@@ -62,26 +62,6 @@ async function findUserByUsername(username) {
   }
 }
 
-async function findUserById(id) {
-  try {
-    const [rows] = await pool.query('SELECT * FROM UserCredentials WHERE UserID = ?', [id]);
-    if (rows.length > 0) {
-      // create user object
-      const user = {
-        id: rows[0].UserID,
-        username: rows[0].Username,
-        password: rows[0].PasswordHash,
-        profileComplete: rows[0].ProfileComplete
-      };
-      return user;
-    } else {
-      return null; // Return null if no user found
-    }
-  } catch (error) {
-    console.error('Error finding user by username:', error);
-    throw error;
-  }
-}
 
 /**
  * Function to find a user by their ID.
@@ -91,14 +71,18 @@ async function findUserById(id) {
 async function findUserById(id) {
   try {
     // Query the database to find the user by ID
-    const [rows] = await pool.query('SELECT * FROM AccountData WHERE UserID = ?', [id]);
-    if (rows.length > 0) {
+    const [userData] = await pool.query('SELECT * FROM UserCredentials WHERE UserID = ?', [id]);
+    if (userData.length > 0) {
+      // Check if profile is completed
+      const [profileData] = await pool.query('SELECT * FROM ClientInformation WHERE UserID = ?', [userData[0].UserID]);
+      const profileCompleted = (profileData.length > 0);
+
       // Create a user object from the fetched data
       const user = {
-        id: rows[0].UserID,
-        username: rows[0].Username,
-        password: rows[0].PasswordHash,
-        profileComplete: rows[0].ProfileComplete
+        id: userData[0].UserID,
+        username: userData[0].Username,
+        password: userData[0].PasswordHash,
+        profileComplete: profileCompleted
       };
       return user;
     } else {
