@@ -5,6 +5,47 @@ const bcrypt = require("bcrypt");
 const passport = require('passport');
 
 //***********************************************************************************
+
+// Implementation will be changed as needed for each unit test
+jest.mock('./authMiddleware', () => ({
+  checkAuthenticated: jest.fn((req, res, next) => {
+    req.user = { id: 1, username: 'test_user', profileComplete: true };
+    next();  // Simulates successful authentication
+  }),
+  checkNotAuthenticated: jest.fn((req, res, next) => {
+    next();  // Simulates non-authenticated scenario for routes that require no auth
+  }),
+  checkProfileComplete: jest.fn((req, res, next) => {
+    next();  // Simulates that the user profile is always complete
+  }),
+  validateRegistration: jest.fn((req, res, next) => {
+    next();  // Placeholder if registration validation always passes
+  }),
+  validateProfileInfo: jest.fn((req, res, next) => {
+    next();  // Placeholder if profile info validation always passes
+  }),
+  validateQuoteFields: jest.fn((req, res, next) => {
+    next();  // Placeholder if quote fields validation always passes
+  })
+}));
+
+const userData = require('./userData');  // Adjust the path as necessary
+jest.mock('./userData', () => ({
+  getUsers: jest.fn(),
+  addUser: jest.fn(),
+  findUserByUsername: jest.fn(),
+  findUserById: jest.fn(),
+  setUserProfileComplete: jest.fn(),
+  getProfileDataById: jest.fn(),
+  storeFuelQuote: jest.fn(),
+  getFuelQuoteHistoryById: jest.fn()
+}));
+
+// Mock passport.authenticate
+passport.authenticate = jest.fn();
+
+
+
 // users.js tests
 describe("GET /users", ()=> {
 
@@ -63,10 +104,6 @@ describe('User ID route', () => {
 
 //***********************************************************************************
 // login.js tests
-
-
-// Mock passport.authenticate
-passport.authenticate = jest.fn();
 
 // Test for GET request
 describe('GET /login', () => {
@@ -164,30 +201,6 @@ describe('POST /login', () => {
 //***********************************************************************************
 //  profile.js tests
 
-
-// Implementation will be changed as needed for each unit test
-jest.mock('./authMiddleware', () => ({
-  checkAuthenticated: jest.fn((req, res, next) => {
-    req.user = { id: 1, username: 'test_user', profileComplete: true };
-    next();  // Simulates successful authentication
-  }),
-  checkNotAuthenticated: jest.fn((req, res, next) => {
-    next();  // Simulates non-authenticated scenario for routes that require no auth
-  }),
-  checkProfileComplete: jest.fn((req, res, next) => {
-    next();  // Simulates that the user profile is always complete
-  }),
-  validateRegistration: jest.fn((req, res, next) => {
-    next();  // Placeholder if registration validation always passes
-  }),
-  validateProfileInfo: jest.fn((req, res, next) => {
-    next();  // Placeholder if profile info validation always passes
-  }),
-  validateQuoteFields: jest.fn((req, res, next) => {
-    next();  // Placeholder if quote fields validation always passes
-  })
-}));
-
 ///////////
 // describe("GET /profile", ()=> {
 
@@ -222,20 +235,6 @@ jest.mock('./authMiddleware', () => ({
 
 
 /////////
-
-const userData = require('./userData');  // Adjust the path as necessary
-jest.mock('./userData', () => ({
-  getUsers: jest.fn(),
-  addUser: jest.fn(),
-  findUserByUsername: jest.fn(),
-  findUserById: jest.fn(),
-  setUserProfileComplete: jest.fn(),
-  getProfileDataById: jest.fn(),
-  storeFuelQuote: jest.fn(),
-  getFuelQuoteHistoryById: jest.fn()
-}));
-
-
 
 // Profile tests
 describe('GET /profile', () => {
@@ -486,8 +485,8 @@ describe('PricingModule', () => {
 
 
 
-// // npx jest extra_tests.test.js
-// // fuelQuoteRoutes.js 
+
+// fuelQuoteRoutes.js 
 
 describe('GET /quote', () => {
   test('should display the initial quote form page when authenticated with a complete profile', async () => {
@@ -542,3 +541,59 @@ describe('POST /quote', () => {
       });
     });
   });
+
+
+
+// history.js 
+
+
+describe('GET /history', () => {
+  test('should successfully access history and call getFuelQuoteHistoryById', async () => {
+    userData.getFuelQuoteHistoryById.mockResolvedValue([]);
+
+    const response = await request(app).get('/history');
+
+    expect(userData.getFuelQuoteHistoryById).toHaveBeenCalled();
+    expect(response.statusCode).toBe(200);
+  });
+});
+
+
+
+// register.js 
+
+describe('GET /register', () => {
+  test('should successfully retrieve register page', async () => {
+    const response = await request(app).get('/register');
+    expect(response.statusCode).toBe(200);
+  });
+});
+
+describe('POST /register', () => {
+  test('should stay on register page if username is already found', async () => {
+      userData.findUserByUsername.mockResolvedValue('test_user');
+
+      const response = await request(app)
+          .post('/register')
+          .send({ username: 'test_user', password: 'password' })
+
+      expect(userData.findUserByUsername).toHaveBeenCalled();
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/register');
+  });
+
+  test('should redirect to login if registration was successful', async () => {
+    userData.findUserByUsername.mockResolvedValue(null);
+    userData.addUser.mockResolvedValue(null)
+
+    const response = await request(app)
+        .post('/register')
+        .send({ username: 'test_user', password: 'password' })
+
+    expect(userData.findUserByUsername).toHaveBeenCalled();
+    expect(userData.addUser).toHaveBeenCalled();
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/login');
+  });
+
+});
