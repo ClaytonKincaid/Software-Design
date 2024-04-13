@@ -20,6 +20,8 @@ Steps to setup DB:
 - run npm run devStart 
 
 # Updates:
+- April 12 2024
+Added unit tests for coverage in users and login js files
 
 - April 12 2024
 Added unit testing the database queries in userData.js 
