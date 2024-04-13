@@ -35,12 +35,15 @@ router.post('/', checkNotAuthenticated, (req, res, next) => {
         }
         req.logIn(user, (error) => {
             if (error) { return next(error) }
+
             // Check if profile is complete, redirect accordingly
-            console.log("login check profile copmlete");
-            console.log(user.profileComplete);
             if (user.profileComplete) {
+                console.log("Logged in user:", user);
+                console.log("User profile completion status:", user.profileComplete);
+                console.log("Redirecting to home.");
                 return res.redirect('/') // Redirect to home/dashboard if profile is complete
             } else {
+                console.log("Redirecting to complete profile.");
                 return res.redirect('/complete-profile') // Redirect to profile completion page
             }
         })
