@@ -4,6 +4,10 @@ const app = require("./server");
 const bcrypt = require("bcrypt");
 const passport = require('passport');
 
+const initialize = require('./passport-config');
+const LocalStrategy = require('passport-local').Strategy;
+const userData = require('./userData');
+
 //***********************************************************************************
 // users.js tests
 describe("GET /users", ()=> {
@@ -82,7 +86,7 @@ describe('POST /login', () => {
     jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
         return (req, res, next) => {
           // Simulate a successful authentication with a user object that has a complete profile
-          callback(null, { id: '123', username: 'test_user', profileComplete: true }, null);
+          callback(null, { id: 123, username: 'test_user', profileComplete: true }, null);
         };
     });
 
@@ -162,3 +166,151 @@ describe('POST /login', () => {
 //  profile.js tests
 
 
+
+
+jest.mock('./authMiddleware', () => ({
+  checkAuthenticated: jest.fn((req, res, next) => {
+    next();
+  }),
+  checkNotAuthenticated: jest.fn((req, res, next) => {
+    next();
+  }),
+  checkProfileComplete: jest.fn((req, res, next) => {
+    next();
+  }),
+  validateRegistration: jest.fn((req, res, next) => {
+    next();
+  }),
+  validateProfileInfo: jest.fn((req, res, next) => {
+    next();
+  }),
+  validateQuoteFields: jest.fn((req, res, next) => {
+    next();
+  })
+}));
+
+
+// npx jest extra_tests.test.js
+// fuelQuoteRoutes.js 
+
+// Mock passport.authenticate
+passport.authenticate = jest.fn();
+
+// Test for GET request
+describe('GET /quote', () => {
+  test('should display the initial quote form page', async () => {
+    const response = await request(app).get('/quote');
+    expect(response.statusCode).toBe(200);
+  });
+});
+
+// Test for POST request
+describe('POST /quote', () => {
+  test('should rerender the page with the fuel quote calcuations', async () => {
+    jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
+        return (req, res, next) => {
+          // Simulate a valid initial form submission
+          callback(null, { id: 1, username: 'test_user', profileComplete: true }, null);
+        };
+    });
+
+    const response = await request(app)
+      .post('/quote')
+      .send({ gallonsRequested: 3, deliveryDate: '2024-05-23' });
+
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/quote');
+  });
+
+  test('should redirect to complete profile page if profile is not complete', async () => {
+    passport.authenticate.mockImplementation((strategy, callback) => () => {
+      const user = { id: 1, username: 'test_user', profileComplete: false };
+      return callback(null, user);
+    });
+
+    const response = await request(app)
+      .post('/quote')
+      .send({ gallonsRequested: 3, deliveryDate: '2024-05-23' });
+
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/complete-profile');
+  });
+
+  test('should handle authentication errors correctly', async () => {
+    jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
+      return (req, res, next) => {
+        // Simulate an authentication error
+        callback(new Error('Authentication error'), null, null);
+      };
+    });
+
+    const response = await request(app).post('/quote').send({ gallonsRequested: '3', deliveryDate: '2024-05-23' });
+    expect(response.statusCode).toBe(500); // Internal server error
+  });
+});
+
+
+describe('POST /quote/confirm-quote', () => {
+  test('should render quote confirmation page', async () => {
+    jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
+        return (req, res, next) => {
+          // Simulate a valid initial form submission
+          callback(null, { id: 1, username: 'test_user', profileComplete: true }, null);
+        };
+    });
+
+    const response = await request(app)
+      .post('/quote/confirm-quote')
+      .send({ gallonsRequested: 3, deliveryDate: '2024-05-23', suggestedPrice: 10.00, totalAmountDue: 30.00 });
+
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/quote/confirm-quote');
+  });
+
+  test('should redirect to complete profile page if profile is not complete', async () => {
+    passport.authenticate.mockImplementation((strategy, callback) => () => {
+      const user = { id: 1, username: 'test_user', profileComplete: false };
+      return callback(null, user);
+    });
+
+    const response = await request(app)
+      .post('/quote/confirm-quote')
+      .send({ gallonsRequested: 3, deliveryDate: '2024-05-23' });
+
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/complete-profile');
+  });
+
+  test('should handle authentication errors correctly', async () => {
+    jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
+      return (req, res, next) => {
+        // Simulate an authentication error
+        callback(new Error('Authentication error'), null, null);
+      };
+    });
+
+    const response = await request(app).post('/quote').send({ gallonsRequested: '3', deliveryDate: '2024-05-23' });
+    expect(response.statusCode).toBe(500); // Internal server error
+  });
+});
+
+
+
+
+// PricingModule.js
+
+const PricingModule = require('./PricingModule');
+
+describe('PricingModule', () => {
+    describe('calculatePrice', () => {
+        it('should correctly calculate the total price based on gallons requested', () => {
+
+            const pricingModule = new PricingModule();
+            const quoteDetails = { gallonsRequested: 3 };
+
+            const totalPrice = pricingModule.calculatePrice(quoteDetails);
+
+            expect(totalPrice).toBe(4.50); // 3 gallons * $1.50 (base price) = $4.50, pricing module isn't fully setup at the moment, this test will need to be changed later
+        });
+    });
+});
