@@ -54,6 +54,7 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
+
 // Use methodOverride middleware to support HTTP verbs such as PUT or DELETE in places where the client doesn't support it. This is used in the logout forms.
 app.use(methodOverride('_method')) 
 

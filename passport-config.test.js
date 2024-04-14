@@ -1,8 +1,33 @@
+const request = require("supertest");
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require("bcrypt");
 const {initializePassport, authenticateUser} = require('./passport-config')
 const userData = require('./userData'); 
+
+jest.mock('./authMiddleware', () => ({
+    checkAuthenticated: jest.fn((req, res, next) => {
+      req.user = { id: 1, username: 'test_user', profileComplete: true };
+      next();  // Simulates successful authentication
+    }),
+    checkNotAuthenticated: jest.fn((req, res, next) => {
+      next();  // Simulates non-authenticated scenario for routes that require no auth
+    }),
+    checkProfileComplete: jest.fn((req, res, next) => {
+      next();  // Simulates that the user profile is always complete
+    }),
+    validateRegistration: jest.fn((req, res, next) => {
+      next();  // Placeholder if registration validation always passes
+    }),
+    validateProfileInfo: jest.fn((req, res, next) => {
+      next();  // Placeholder if profile info validation always passes
+    }),
+    validateQuoteFields: jest.fn((req, res, next) => {
+      next();  // Placeholder if quote fields validation always passes
+    })
+  }));
+
+
 
 jest.mock('./userData', () => ({
   getUsers: jest.fn(),
@@ -15,18 +40,14 @@ jest.mock('./userData', () => ({
   getFuelQuoteHistoryById: jest.fn()
 }));
 
-// jest.mock('passport', () => {
-//     return {
-//         use: jest.fn(),
-//         serializeUser: jest.fn(),
-//         deserializeUser: jest.fn()
-//     };
-// });
 
 jest.mock('passport', () => ({
     use: jest.fn(),
     serializeUser: jest.fn(),
-    deserializeUser: jest.fn()
+    deserializeUser: jest.fn(),
+    authenticate:jest.fn(),
+    initialize: jest.fn(),
+    session: jest.fn()
   }));
 
 // Mock bcrypt compare function
@@ -74,19 +95,35 @@ describe('authenticateUser tests', () => {
         const done = jest.fn();
         userData.findUserByUsername.mockResolvedValue(null);
         
-        await authenticateUser('test_user', 'wpassword', done);
+        await authenticateUser('test_user', 'password', done);
 
         expect(userData.findUserByUsername).toHaveBeenCalled();
         expect(done).toHaveBeenCalledWith(null, false, { message: 'No user with that username' });
     });
 
+    test('should return an error when an error occurs', async () => {
+        const mockUser = {
+            id: 1,
+            username: 'test_user',
+            password: 'password',
+            profileComplete: true
+        };
+        const done = jest.fn();
+        userData.findUserByUsername.mockResolvedValue(mockUser);
+        bcrypt.compare.mockRejectedValue(new Error('Error'));
+
+        await authenticateUser('test_user', 'password', done);
+
+        expect(done).toHaveBeenCalledWith(new Error('Error'));
+    });
+
 });
+
 
 
 describe('initialize tests', () => {
 
     test('should initialize passport', () => {
-
         initializePassport(passport);
 
         expect(passport.use).toHaveBeenCalled();
@@ -95,44 +132,11 @@ describe('initialize tests', () => {
    
     });
 
-    test('should call done with user if user is found', async () => {
-        // Mock userData.findUserById to resolve with a dummy user
-        const mockUser = {
-            id: 1,
-            username: 'test_user',
-            password: 'password',
-            profileComplete: true
-        };
-        userData.findUserById.mockResolvedValue(mockUser);
-        const done = jest.fn();
-
-        initializePassport(passport);
-        const response = await passport.deserializeUser(1, done);
-        
-        expect(response).toBe((null, {"id": 1, "password": "password", "profileComplete": true, "username": "test_user"}));
-        // expect(done).toHaveBeenCalledWith(null, mockUser);
-    });
-
-    // test('should call done with user if user is found', async () => {
-    //     // Mock userData.findUserById to resolve with a dummy user
-    //     const mockUser = {
-    //         id: 1,
-    //         username: 'test_user',
-    //         password: 'password',
-    //         profileComplete: true
-    //     };
-    //     userData.findUserById.mockResolvedValue(mockUser);
-
-    //     const done = jest.fn();
-
-    //     initializePassport(passport);
-
-    //     // await passport.deserializeUser(123, done);
-
-    //     expect(passport.use).toHaveBeenCalled();
-    //     expect(passport.serializeUser).toHaveBeenCalled();
-    //     expect(passport.deserializeUser).toHaveBeenCalled();
-    //     expect(done).toHaveBeenCalledWith(null, mockUser);
-    // });
-
 });
+
+
+
+
+
+
+

@@ -40,6 +40,9 @@ function initializePassport(passport) {
             done(error, null);
         }
     });
+
+    console.log(passport.deserializeUser.toString());
+
 }
 
 
