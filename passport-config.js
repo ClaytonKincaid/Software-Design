@@ -41,8 +41,6 @@ function initializePassport(passport) {
         }
     });
 
-    console.log(passport.deserializeUser.toString());
-
 }
 
 
