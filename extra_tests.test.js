@@ -493,6 +493,3 @@ describe('POST /register', () => {
   });
 
 });
-
-
-// passport-config.js
