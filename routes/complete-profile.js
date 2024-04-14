@@ -14,12 +14,13 @@ let userProfile = {
 };
 
 // Route to display the profile completion form
-router.get("/", checkAuthenticated, (req, res) => {
+router.get("/", checkAuthenticated, async (req, res) => {
     // Check if user's profile is already complete, redirect them accordingly
-    const currentUser = userData.findUserById(req.user.id)
+    const currentUser = await userData.findUserById(req.user.id)
     if (currentUser && currentUser.profileComplete) {
         return res.redirect('/') // User's profile is already complete
     }
+    
     res.render("completeProfile", { userProfile: currentUser })
 })
 
@@ -46,7 +47,7 @@ router.post("/", checkAuthenticated, validateProfileInfo, async (req, res) => {
         res.redirect('/'); // Redirect to home after profile completion
     } catch (error) {
         console.error('Error completing profile:', error);
-        res.redirect('/error'); // Redirect to an error page if an error occurs
+        res.status(500).send('Error completing profile');
     }
 });
 

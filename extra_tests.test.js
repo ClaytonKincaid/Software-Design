@@ -5,6 +5,47 @@ const bcrypt = require("bcrypt");
 const passport = require('passport');
 
 //***********************************************************************************
+
+// Implementation will be changed as needed for each unit test
+jest.mock('./authMiddleware', () => ({
+  checkAuthenticated: jest.fn((req, res, next) => {
+    req.user = { id: 1, username: 'test_user', profileComplete: true };
+    next();  // Simulates successful authentication
+  }),
+  checkNotAuthenticated: jest.fn((req, res, next) => {
+    next();  // Simulates non-authenticated scenario for routes that require no auth
+  }),
+  checkProfileComplete: jest.fn((req, res, next) => {
+    next();  // Simulates that the user profile is always complete
+  }),
+  validateRegistration: jest.fn((req, res, next) => {
+    next();  // Placeholder if registration validation always passes
+  }),
+  validateProfileInfo: jest.fn((req, res, next) => {
+    next();  // Placeholder if profile info validation always passes
+  }),
+  validateQuoteFields: jest.fn((req, res, next) => {
+    next();  // Placeholder if quote fields validation always passes
+  })
+}));
+
+const userData = require('./userData');
+jest.mock('./userData', () => ({
+  getUsers: jest.fn(),
+  addUser: jest.fn(),
+  findUserByUsername: jest.fn(),
+  findUserById: jest.fn(),
+  setUserProfileComplete: jest.fn(),
+  getProfileDataById: jest.fn(),
+  storeFuelQuote: jest.fn(),
+  getFuelQuoteHistoryById: jest.fn()
+}));
+
+// Mock passport.authenticate
+passport.authenticate = jest.fn();
+
+
+
 // users.js tests
 describe("GET /users", ()=> {
 
@@ -64,13 +105,9 @@ describe('User ID route', () => {
 //***********************************************************************************
 // login.js tests
 
-
-// Mock passport.authenticate
-passport.authenticate = jest.fn();
-
 // Test for GET request
 describe('GET /login', () => {
-  test('should display the login page', async () => {
+  test('should return 200', async () => {
     const response = await request(app).get('/login');
     expect(response.statusCode).toBe(200);
   });
@@ -162,174 +199,74 @@ describe('POST /login', () => {
 
 
 //***********************************************************************************
-//  profile.js tests
 
+// profile.js tests
 
-jest.mock('./authMiddleware', () => ({
-  checkAuthenticated: jest.fn((req, res, next) => {
-    next();  // Simulates successful authentication
-  }),
-  checkNotAuthenticated: jest.fn((req, res, next) => {
-    next();  // Simulates non-authenticated scenario for routes that require no auth
-  }),
-  checkProfileComplete: jest.fn((req, res, next) => {
-    next();  // Simulates that the user profile is always complete
-  }),
-  validateRegistration: jest.fn((req, res, next) => {
-    next();  // Placeholder if registration validation always passes
-  }),
-  validateProfileInfo: jest.fn((req, res, next) => {
-    next();  // Placeholder if profile info validation always passes
-  }),
-  validateQuoteFields: jest.fn((req, res, next) => {
-    next();  // Placeholder if quote fields validation always passes
-  })
-}));
-
-///////////
-// describe("GET /profile", ()=> {
-
-//   describe("given /profile endpoint", () => {
-
-//     test("should respond with status code 200", async () => {
-
-//       // jest.mock('./userData', () => ({
-//       //   getProfileDataById: jest.fn()
-//       // }));
-
-//       // // Define the mock profile data
-//       // const mockProfileData = {
-//       //   fullName: 'John Doe',
-//       //   address1: '123 Main St',
-//       //   address2: '',
-//       //   city: 'Anytown',
-//       //   state: 'NY',
-//       //   zipcode: '12345'
-//       // };
-
-//       // // Configure the mock to return this data when called
-//       // userData.getProfileDataById.mockResolvedValue(mockProfileData);
-  
-//       // Make a GET request to the /profile route
-//       const response = await request(app).get('/profile');
-//       expect(response.statusCode).toBe(200)
-//     })
-    
-//   })
-// })
-
-
-/////////
-
-const userData = require('./userData');  // Adjust the path as necessary
-jest.mock('./userData', () => ({
-  getUsers: jest.fn(),
-  addUser: jest.fn(),
-  findUserByUsername: jest.fn(),
-  findUserById: jest.fn(),
-  setUserProfileComplete: jest.fn(),
-  getProfileDataById: jest.fn(),
-  storeFuelQuote: jest.fn(),
-  getFuelQuoteHistoryById: jest.fn()
-}));
-
-
-
-// Profile tests
 describe('GET /profile', () => {
-  // it('should return 200 if user is found', async () => {
+  test('should return 200 when retrieving profile page while authenticated with a complete profile', async () => {
+    const mockProfileData = {
+      fullName: "Full Name",
+      address1: "Address 1",
+      address2: "Address 2",
+      city: "City",
+      state: "TX",
+      zipcode: "12345"
+    }
+    userData.getProfileDataById.mockResolvedValue(mockProfileData);
 
-  //   userData.getProfileDataById.mockResolvedValue({
-  //     fullName: 'John Doe',
-  //     address1: '123 Main St',
-  //     city: 'Anytown',
-  //     state: 'NY',
-  //     zipcode: '12345'
-  //   });
+    const response = await request(app).get('/profile');
 
-  //   const res = await request(app)
-  //     .get('/profile')
-  //   expect(res.status).toEqual(200);
-  // });
-  userData.getProfileDataById.mockResolvedValue(null);
+    expect(userData.getProfileDataById).toHaveBeenCalled();
+    expect(response.statusCode).toBe(200);
+  });
 
-  it('should return 500 if error is caught', async () => {
-    userData.findUserById.mockReturnValue(undefined); // user does not exist
-    const res = await request(app)
-      .get('/profile')
-    expect(res.status).toEqual(500);
+  test('should return 404 when retrieving profile page while a user that can not be found', async () => {
+    userData.getProfileDataById.mockResolvedValue(null);
+
+    const response = await request(app).get('/profile');
+
+    expect(userData.getProfileDataById).toHaveBeenCalled();
+    expect(response.statusCode).toBe(404);
   });
 });
 
+describe('POST /profile', () => {
+    test('should return 302 when sent valid profile data', async () => {
+      const mockProfileData = {
+        fullName: "Full Name",
+        address1: "Address 1",
+        address2: "Address 2",
+        city: "City",
+        state: "TX",
+        zipcode: "12345"
+      }
 
-// jest.mock('./authMiddleware', () => ({
-//   checkAuthenticated: jest.fn((req, res, next) => next()),
-//   checkProfileComplete: jest.fn((req, res, next) => next()),
-//   validateProfileInfo: jest.fn((req, res, next) => next())
-// }));
+      userData.setUserProfileComplete.mockResolvedValue(null);
 
+      const response = await request(app)
+          .post('/profile')
+          .send(mockProfileData)
 
-// // Mock userData setUserProfileComplete function
-// userData.setUserProfileComplete = jest.fn();
-// checkAuthenticated = jest.fn()
+      expect(userData.setUserProfileComplete).toHaveBeenCalled();
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/profile');
+  });
 
-// describe('POST /', () => {
-//   it('should update the user profile and redirect', async () => {
-//     userData.setUserProfileComplete.mockResolvedValue();  // Mock successful database operation
-//     const profileData = {
-//       fullName: 'Jane Doe',
-//       address1: '456 Elm St',
-//       address2: '',
-//       city: 'Springfield',
-//       state: 'IL',
-//       zipcode: '62704'
-//     };
-  
-//     const response = await request(app)
-//       .post('/')
-//       .send(profileData);
-  
-//     expect(response.status).toBe(302);
-//     expect(response.headers.location).toBe('/profile');
-//   });
+  test('should return 500 when sent invalid profile data', async () => {
+    const mockProfileData = {
+      // No data sent
+    }
 
-//   it('should handle database errors by redirecting to the profile page', async () => {
-//     userData.setUserProfileComplete.mockRejectedValue(new Error('Database error'));  // Force a rejection to simulate DB error
-  
-//     const response = await request(app)
-//       .post('/')
-//       .send({
-//         fullName: 'Jane Doe',
-//         address1: '456 Elm St',
-//         city: 'Springfield',
-//         state: 'IL',
-//         zipcode: '62704'
-//       });
-  
-//     expect(response.status).toBe(302);
-//     expect(response.headers.location).toBe('/profile');
-//   });
+    userData.setUserProfileComplete.mockRejectedValue(new Error('Some error message'));
 
+    const response = await request(app)
+        .post('/profile')
+        .send(mockProfileData)
 
-//   it('should validate input before updating profile', async () => {
-//     validateProfileInfo.mockImplementationOnce((req, res, next) => res.status(400).send('Invalid input'));
-
-//     const response = await request(app)
-//       .post('/')
-//       .send({
-//         fullName: '',  // Example of potentially invalid data
-//         address1: '456 Elm St',
-//         city: 'Springfield',
-//         state: 'IL',
-//         zipcode: '62704'
-//       });
-
-//     expect(response.status).toBe(400);
-//     expect(response.text).toBe('Invalid input');
-//   });
-
-// });
-
+    expect(userData.setUserProfileComplete).toHaveBeenCalled();
+    expect(response.statusCode).toBe(500);
+  });
+});
 
 
 
@@ -338,108 +275,68 @@ describe('GET /profile', () => {
 //***********************************************************************************
 //  completeProfile.js tests
 
-// const { checkAuthenticated, checkProfileComplete } = require('./authMiddleware');
-
-// jest.mock('./authMiddleware', () => ({
-//   checkAuthenticated: jest.fn().mockImplementation((req, res, next) => next()),
-//   checkProfileComplete: jest.fn().mockImplementation((req, res, next) => next())
-// }));
-
-// // Mock passport.authenticate
-// passport.authenticate = jest.fn();
-
-// jest.mock('./userData', () => ({
-//   findUserById: jest.fn(),
-//   setUserProfileComplete: jest.fn()
-// }));
-
-// jest.mock('./authMiddleware', () => ({
-//   checkAuthenticated: jest.fn((req, res, next) => next()),
-//   validateProfileInfo: jest.fn((req, res, next) => next())
-// }));
-
-// Complete profile
 describe('GET /complete-profile', () => {
+  test('should return 200 when authenticated with an incomplete profile', async () => {
+    userData.findUserById.mockResolvedValue({ id: '123', username: 'test_user', profileComplete: false });
 
-  // jest.mock('./userData', () => ({
-  //   findUserById: jest.fn()
-  // }));
-
-  // const userData = require('./userData');
-
-  beforeEach(() => {
-    // Mock `findUserById` to return a user object when called with any user ID.
-    userData.findUserById.mockResolvedValue({
-      id: 1,
-      username: 'testuser',
-      profileComplete: true
-    });
-  });
-  
-  it('should redirect if user profile is already complete', async () => {
-    userData.findUserById.mockResolvedValue({ id: 1, profileComplete: true });
-
-    const response = await request(app).get('/');
+    const response = await request(app).get('/complete-profile');
     
+    expect(userData.findUserById).toHaveBeenCalled();
     expect(response.statusCode).toBe(200);
-    // expect(response.headers.location).toBe('/');
   });
 
-  it('should return 302 if user profile is not complete', async () => {
-    userData.findUserById.mockResolvedValue({ id: 1, profileComplete: false });
+  test('should redirect to home if user found with a completed profile', async () => {
+    userData.findUserById.mockResolvedValue({ id: '123', username: 'test_user', profileComplete: true });
 
-    const response = await request(app).get('/');
-    
-    expect(response.statusCode).toBe(200);
-    // expect(response.text).toBe('Profile Incomplete');
+    const response = await request(app).get('/complete-profile');
+
+    expect(userData.findUserById).toHaveBeenCalled();
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/');
 
   });
-
-  // it('should redirect to home if user is authenticated and profile is complete', async () => {
-  //   // Mock userData to return a complete profile
-  //   userData.findUserById.mockReturnValue({ id: '123', profileComplete: true });
-
-  //   const res = await request(app)
-  //     .get('/complete-profile')
-
-  //   expect(res.status).toEqual(302);
-  //   expect(res.header.location).toEqual('/');
-  // });
-
-  // it('should redirect to /login if user is not authenticated', async () => {
-  //   const res = await request(app).get('/complete-profile');
-
-  //   expect(res.status).toEqual(302);
-  //   expect(res.header.location).toEqual('/login');
-  // });
 });
 
 
-// describe('POST /complete-profile', () => {
-//   it('should update user profile and redirect to /profile', async () => {
-//     // Mock request body
-//     const profileData = {
-//       fullName: 'John Doe',
-//       address1: '123 Main St',
-//       address2: 'Apt 101',
-//       city: 'Anytown',
-//       state: 'NY',
-//       zipcode: '12345'
-//     };
+describe('POST /complete-profile', () => {
+  test('should redirect to home when sent valid profile data', async () => {
+    const mockProfileData = {
+      fullName: "Full Name",
+      address1: "Address 1",
+      address2: "Address 2",
+      city: "City",
+      state: "TX",
+      zipcode: "12345"
+    }
 
-//     const authenticatedUserId = '123';
+    userData.setUserProfileComplete.mockResolvedValue(null);
 
-//     userData.findUserById.mockReturnValue({ id: authenticatedUserId });
+    const response = await request(app)
+        .post('/complete-profile')
+        .send(mockProfileData)
 
-//     const res = await request(app)
-//       .post('/complete-profile')
-//       .send(profileData)
+    expect(userData.setUserProfileComplete).toHaveBeenCalled();
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/');
+  });
 
-//     expect(userData.setUserProfileComplete).toHaveBeenCalledWith(authenticatedUserId, profileData);
-//     expect(res.status).toEqual(302);
-//     expect(res.header.location).toEqual('/profile');
-//   });
-// });
+  test('should return 500 when sent invalid profile data', async () => {
+    const mockProfileData = {
+      // No data sent
+    }
+
+    userData.setUserProfileComplete.mockRejectedValue(new Error('Some error message'));
+
+    const response = await request(app)
+        .post('/complete-profile')
+        .send(mockProfileData)
+
+    expect(userData.setUserProfileComplete).toHaveBeenCalled();
+    expect(response.statusCode).toBe(500);
+  });
+});
+
+
 
 // Pricingmodule
 const PricingModule = require('./PricingModule');
@@ -484,127 +381,118 @@ describe('PricingModule', () => {
 
 
 
-// // npx jest extra_tests.test.js
-// // fuelQuoteRoutes.js 
 
-// // Mock passport.authenticate
-// passport.authenticate = jest.fn();
+// fuelQuoteRoutes.js 
 
-// // Test for GET request
-// describe('GET /quote', () => {
-//   test('should display the initial quote form page', async () => {
-//     const response = await request(app).get('/quote');
-//     expect(response.statusCode).toBe(200);
-//   });
-// });
+describe('GET /quote', () => {
+  test('should display the initial quote form page when authenticated with a complete profile', async () => {
+    const response = await request(app).get('/quote');
+    expect(response.statusCode).toBe(200);
+  });
+});
 
-// // Test for POST request
-// describe('POST /quote', () => {
-//   test('should rerender the page with the fuel quote calcuations', async () => {
-//     jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
-//         return (req, res, next) => {
-//           // Simulate a valid initial form submission
-//           callback(null, { id: 1, username: 'test_user', profileComplete: true }, null);
-//         };
-//     });
+describe('POST /quote', () => {
+    test('should call getProfileDataById and rerender the page with the fuel quote calcuations', async () => {
 
-//     const response = await request(app)
-//       .post('/quote')
-//       .send({ gallonsRequested: 3, deliveryDate: '2024-05-23' });
+      const mockProfileData = {
+        fullName: 'Full Name',
+        address1: 'Address 1',
+        address2: 'Address 2',
+        city: 'City',
+        state: 'TX',
+        zipcode: 77024
+      };
 
-//     expect(response.statusCode).toBe(302);
-//     expect(response.headers.location).toBe('/quote');
-//   });
+      userData.getProfileDataById.mockResolvedValue(mockProfileData);
+  
+        const response = await request(app)
+            .post('/quote')
+            .send({ gallonsRequested: '3', deliveryDate: '2024-05-07' })
+  
+        expect(userData.getProfileDataById).toHaveBeenCalled();
+        expect(response.statusCode).toBe(200);
+    });
 
-//   test('should redirect to complete profile page if profile is not complete', async () => {
-//     passport.authenticate.mockImplementation((strategy, callback) => () => {
-//       const user = { id: 1, username: 'test_user', profileComplete: false };
-//       return callback(null, user);
-//     });
+    describe('POST /quote/confirm-quote', () => {
+      test('should call getProfileDataById and storeFuelQuote', async () => {
+        const mockProfileData = {
+            fullName: 'Full Name',
+            address1: 'Address 1',
+            address2: 'Address 2',
+            city: 'City',
+            state: 'TX',
+            zipcode: '77024'
+          };
+    
+        userData.getProfileDataById.mockResolvedValue(mockProfileData);
+        userData.storeFuelQuote.mockResolvedValue(null);
+      
+        const response = await request(app)
+          .post('/quote/confirm-quote')
+          .send({ gallonsRequested: '3', deliveryDate: '2024-05-23', suggestedPrice:'10.00', totalAmountDue: '30.00' });
 
-//     const response = await request(app)
-//       .post('/quote')
-//       .send({ gallonsRequested: 3, deliveryDate: '2024-05-23' });
-
-//     expect(response.statusCode).toBe(302);
-//     expect(response.headers.location).toBe('/complete-profile');
-//   });
-
-//   test('should handle authentication errors correctly', async () => {
-//     jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
-//       return (req, res, next) => {
-//         // Simulate an authentication error
-//         callback(new Error('Authentication error'), null, null);
-//       };
-//     });
-
-//     const response = await request(app).post('/quote').send({ gallonsRequested: '3', deliveryDate: '2024-05-23' });
-//     expect(response.statusCode).toBe(500); // Internal server error
-//   });
-// });
-
-
-// describe('POST /quote/confirm-quote', () => {
-//   test('should render quote confirmation page', async () => {
-//     jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
-//         return (req, res, next) => {
-//           // Simulate a valid initial form submission
-//           callback(null, { id: 1, username: 'test_user', profileComplete: true }, null);
-//         };
-//     });
-
-//     const response = await request(app)
-//       .post('/quote/confirm-quote')
-//       .send({ gallonsRequested: 3, deliveryDate: '2024-05-23', suggestedPrice: 10.00, totalAmountDue: 30.00 });
-
-//     expect(response.statusCode).toBe(302);
-//     expect(response.headers.location).toBe('/quote/confirm-quote');
-//   });
-
-//   test('should redirect to complete profile page if profile is not complete', async () => {
-//     passport.authenticate.mockImplementation((strategy, callback) => () => {
-//       const user = { id: 1, username: 'test_user', profileComplete: false };
-//       return callback(null, user);
-//     });
-
-//     const response = await request(app)
-//       .post('/quote/confirm-quote')
-//       .send({ gallonsRequested: 3, deliveryDate: '2024-05-23' });
-
-//     expect(response.statusCode).toBe(302);
-//     expect(response.headers.location).toBe('/complete-profile');
-//   });
-
-//   test('should handle authentication errors correctly', async () => {
-//     jest.spyOn(passport, 'authenticate').mockImplementation((strategy, callback) => {
-//       return (req, res, next) => {
-//         // Simulate an authentication error
-//         callback(new Error('Authentication error'), null, null);
-//       };
-//     });
-
-//     const response = await request(app).post('/quote').send({ gallonsRequested: '3', deliveryDate: '2024-05-23' });
-//     expect(response.statusCode).toBe(500); // Internal server error
-//   });
-// });
+        expect(userData.getProfileDataById).toHaveBeenCalled();
+        expect(userData.storeFuelQuote).toHaveBeenCalled();
+        expect(response.statusCode).toBe(200);
+      });
+    });
+  });
 
 
 
+// history.js 
 
-// // PricingModule.js
 
-// const PricingModule = require('./PricingModule');
+describe('GET /history', () => {
+  test('should successfully access history and call getFuelQuoteHistoryById', async () => {
+    userData.getFuelQuoteHistoryById.mockResolvedValue([]);
 
-// describe('PricingModule', () => {
-//     describe('calculatePrice', () => {
-//         it('should correctly calculate the total price based on gallons requested', () => {
+    const response = await request(app).get('/history');
 
-//             const pricingModule = new PricingModule();
-//             const quoteDetails = { gallonsRequested: 3 };
+    expect(userData.getFuelQuoteHistoryById).toHaveBeenCalled();
+    expect(response.statusCode).toBe(200);
+  });
+});
 
-//             const totalPrice = pricingModule.calculatePrice(quoteDetails);
 
-//             expect(totalPrice).toBe(4.50); // 3 gallons * $1.50 (base price) = $4.50, pricing module isn't fully setup at the moment, this test will need to be changed later
-//         });
-//     });
-// });
+
+// register.js 
+
+describe('GET /register', () => {
+  test('should successfully retrieve register page', async () => {
+    const response = await request(app).get('/register');
+    expect(response.statusCode).toBe(200);
+  });
+});
+
+describe('POST /register', () => {
+  test('should stay on register page if username is already found', async () => {
+      userData.findUserByUsername.mockResolvedValue('test_user');
+
+      const response = await request(app)
+          .post('/register')
+          .send({ username: 'test_user', password: 'password' })
+
+      expect(userData.findUserByUsername).toHaveBeenCalled();
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/register');
+  });
+
+  test('should redirect to login if registration was successful', async () => {
+    userData.findUserByUsername.mockResolvedValue(null);
+    userData.addUser.mockResolvedValue(null)
+
+    const response = await request(app)
+        .post('/register')
+        .send({ username: 'test_user', password: 'password' })
+
+    expect(userData.findUserByUsername).toHaveBeenCalled();
+    expect(userData.addUser).toHaveBeenCalled();
+    expect(response.statusCode).toBe(302);
+    expect(response.headers.location).toBe('/login');
+  });
+
+});
+
+
+// passport-config.js

@@ -25,7 +25,7 @@ const { checkNotAuthenticated } = require('./authMiddleware')
 const methodOverride = require('method-override')
 
 const passport = require('passport')
-const initializePassport = require('./passport-config')
+const {initializePassport} = require('./passport-config')
 
 // Initialize the passport module with strategies for user authentication
 initializePassport(

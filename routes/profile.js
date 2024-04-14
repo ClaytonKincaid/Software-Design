@@ -62,7 +62,7 @@ router.post("/", checkAuthenticated, checkProfileComplete, validateProfileInfo, 
         res.redirect('/profile'); // Redirect to home or dashboard after profile completion
     } catch (error) {
         console.error('Error updating user profile:', error);
-        res.redirect('/profile'); // Redirect to profile page in case of an error
+        res.status(500).send('Error completing profile');
     }
 });
 
