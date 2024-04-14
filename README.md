@@ -1,5 +1,9 @@
 # Software-Design-Temp
 
+Coverage Report:  
+![image](https://github.com/ClaytonKincaid/Software-Design/assets/84551085/0ddd0516-5c56-4796-a41e-5c90736d9b11)
+
+
 # How to run
 - Add .env file, look at env_example.txt file for example env file
 - Perform npm install to download all project dependencies
