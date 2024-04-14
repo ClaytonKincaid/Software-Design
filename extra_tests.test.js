@@ -442,7 +442,6 @@ describe('POST /quote', () => {
 
 // history.js 
 
-
 describe('GET /history', () => {
   test('should successfully access history and call getFuelQuoteHistoryById', async () => {
     userData.getFuelQuoteHistoryById.mockResolvedValue([]);
@@ -493,3 +492,25 @@ describe('POST /register', () => {
   });
 
 });
+
+
+// server.js
+describe('DELETE /logout', () => {
+  test('should redirect to /login after logging out', async () => {
+    const response = await request(app)
+      .delete('/logout')
+
+    expect(response.statusCode).toBe(302);
+    expect(response.header['location']).toBe('/login');
+  });
+});
+
+describe('GET /', () => {
+  it('should render the home page when authenticated', async () => {
+    const response = await request(app).get('/');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.text).toContain('<h2>Home</h2>');
+  });
+});
+

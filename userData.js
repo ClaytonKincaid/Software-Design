@@ -185,7 +185,6 @@ async function getFuelQuoteHistoryById(id) {
     // Check if fuel quote history data exists for the user
     if (rows.length > 0) {
       const fuelQuoteHistory = rows.map(row => ({
-        estimateDate: row.estimateDate,
         gallonsRequested: row.GallonsRequested,
         deliveryAddress: row.DeliveryAddress,
         deliveryDate: row.DeliveryDate,

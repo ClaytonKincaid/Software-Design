@@ -70,9 +70,6 @@ app.use(methodOverride('_method'))
 // use this since new passport version requires callback function
 app.delete('/logout', (req, res) => {
     req.logout(function(error) {
-        if (error) { 
-            return next(error) 
-        }
         res.redirect('/login')
     })
     // res.redirect('/login')
