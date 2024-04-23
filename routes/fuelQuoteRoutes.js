@@ -22,21 +22,30 @@ router.get('/', checkAuthenticated, checkProfileComplete, (req, res) => {
 // Route to handle the form submission
 router.post('/', checkAuthenticated, checkProfileComplete, validateQuoteFields, async (req, res) => {
     try {
+        // Extract gallonsRequested and deliveryDate from the request body
         const { gallonsRequested, deliveryDate } = req.body;
 
+        // Retrieve additional profile data based on the user ID
         const profileData = await userData.getProfileDataById(req.user.id);
+
+        // Fetch fuel quote history for the user
+        const fuelQuoteHistory = await userData.getFuelQuoteHistoryById(req.user.id);
 
         const quoteDetails = {
             userId: req.user.id,
             gallonsRequested: parseFloat(gallonsRequested),
             deliveryAddress: profileData.address1,
-            deliveryDate: deliveryDate
+            deliveryDate: deliveryDate,
+            deliveryState: profileData.state,
+            fuelQuoteHistory: fuelQuoteHistory
         };
 
-        // Calculate the price
+        // Calculate the suggested price per gallon using the PricingModule
         const suggestedPricePerGallon = pricingModule.calculatePrice(quoteDetails);
+        // Calculate the total amount due
         const totalAmountDue = suggestedPricePerGallon * quoteDetails.gallonsRequested;
 
+        // Update the quoteDetails object with calculated values
         quoteDetails.suggestedPrice = suggestedPricePerGallon;
         quoteDetails.totalAmountDue = totalAmountDue;
 
