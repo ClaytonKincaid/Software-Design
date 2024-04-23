@@ -25,6 +25,11 @@ Steps to setup DB:
 - run npm run devStart 
 
 # Updates:
+
+- April 23 2024
+
+Updated pricing module to follow new formula for fuel quote calculation
+
 - April 12 2024
 
 Renamed unit test file
