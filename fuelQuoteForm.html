@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuel Quote</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        window.onload = function() {
+            document.getElementById('quoteForm').onsubmit = function() {
+                var gallonsRequested = document.getElementById('gallonsRequested').value;
+                var deliveryDate = document.getElementById('deliveryDate').value;
+                
+                if (gallonsRequested <= 0) {
+                    alert('Please enter a valid number of gallons requested.');
+                    return false; // Prevent form submission
+                }
+
+                var currentDate = new Date();
+                var selectedDate = new Date(deliveryDate);
+                if (selectedDate < currentDate) {
+                    alert('Please select a future delivery date.');
+                    return false; // Prevent form submission
+                }
+            };
+        };
+    </script>
 </head>
 <body>
     <header>
@@ -32,4 +52,5 @@
     </div>
 </body>
 </html>
+
 
