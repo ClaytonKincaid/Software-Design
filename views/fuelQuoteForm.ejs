@@ -25,7 +25,7 @@
 
     <div class="container">
         <h2 class="pageTitle">Fuel Quote Form</h2>
-        <form id="quoteForm" action="/quote" method="post">
+        <form id="quoteForm" action="/quote" method="post" onsubmit="return validateForm()">
             <label for="gallonsRequested">Gallons Requested:</label>
             <input type="number" id="gallonsRequested" name="gallonsRequested" value="<%= gallonsRequested %>" required>
             
@@ -52,5 +52,23 @@
             </form>
         <% } %>
     </div>
+
+    <script>
+        function validateForm() {
+            var gallonsRequested = document.getElementById('gallonsRequested').value;
+            var deliveryDate = document.getElementById('deliveryDate').value;
+            
+            // Convert deliveryDate string to Date object
+            var selectedDate = new Date(deliveryDate);
+            var currentDate = new Date();
+
+            // Check if delivery date is in the past or gallonsRequested is zero or less
+            if (selectedDate < currentDate || gallonsRequested <= 0) {
+                alert("Please select a valid future delivery date and request gallons more than 0.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>
