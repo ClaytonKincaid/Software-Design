@@ -350,25 +350,76 @@ describe('PricingModule', () => {
   });
 
   test('calculatePrice returns the correct total price based on gallons requested', () => {
-      const quoteDetails = { gallonsRequested: 10 };
-      const expectedTotal = 15; // 10 gallons * $1.50 per gallon
-      const result = pricingModule.calculatePrice(quoteDetails);
+    const fuelQuoteHistory = [
+      {
+        gallonsRequested: '1234.00',
+        deliveryAddress: 'delivery address',
+        deliveryDate: '2024-06-15T05:00:00.000Z',
+        suggestedPrice: '1.74',
+        quote: '2147.16'
+      }
+    ]
+
+    const quoteDetails = {
+      gallonsRequested: 10,
+      deliveryAddress: "delivery address",
+      deliveryDate: "delivery date",
+      deliveryState: "TX",
+      fuelQuoteHistory: fuelQuoteHistory
+  };
+
+      const expectedTotal = 17.10; // 10 gallons * $1.50 per gallon
+      const result = quoteDetails.gallonsRequested * pricingModule.calculatePrice(quoteDetails);
       
       expect(result).toBe(expectedTotal);
   });
 
   test('calculatePrice handles zero gallons', () => {
-      const quoteDetails = { gallonsRequested: 0 };
+    const fuelQuoteHistory = [
+      {
+        gallonsRequested: '1234.00',
+        deliveryAddress: 'delivery address',
+        deliveryDate: '2024-06-15T05:00:00.000Z',
+        suggestedPrice: '1.74',
+        quote: '2147.16'
+      }
+    ]
+
+    const quoteDetails = {
+      gallonsRequested: 0,
+      deliveryAddress: "delivery address",
+      deliveryDate: "delivery date",
+      deliveryState: "TX",
+      fuelQuoteHistory: fuelQuoteHistory
+  };
+
       const expectedTotal = 0; // 0 gallons * $1.50 per gallon = $0
-      const result = pricingModule.calculatePrice(quoteDetails);
+      const result = quoteDetails.gallonsRequested * pricingModule.calculatePrice(quoteDetails);
       
       expect(result).toBe(expectedTotal);
   });
 
   test('calculatePrice handles large quantities', () => {
-      const quoteDetails = { gallonsRequested: 1000 };
-      const expectedTotal = 1500; // 1000 gallons * $1.50 per gallon
-      const result = pricingModule.calculatePrice(quoteDetails);
+    const fuelQuoteHistory = [
+      {
+        gallonsRequested: '1234.00',
+        deliveryAddress: 'address',
+        deliveryDate: '2024-06-15T05:00:00.000Z',
+        suggestedPrice: '1.74',
+        quote: '2147.16'
+      }
+    ]
+
+    const quoteDetails = {
+      gallonsRequested: 1000,
+      deliveryAddress: "delivery address",
+      deliveryDate: "delivery date",
+      deliveryState: "TX",
+      fuelQuoteHistory: fuelQuoteHistory
+  };
+  
+      const expectedTotal = 1710; // 1000 gallons * $1.50 per gallon
+      const result = quoteDetails.gallonsRequested * pricingModule.calculatePrice(quoteDetails);
       
       expect(result).toBe(expectedTotal);
   });
@@ -386,6 +437,17 @@ describe('PricingModule', () => {
 
 describe('GET /quote', () => {
   test('should display the initial quote form page when authenticated with a complete profile', async () => {
+    const mockProfileData = {
+      fullName: "Full Name",
+      address1: "Address 1",
+      address2: "Address 2",
+      city: "City",
+      state: "TX",
+      zipcode: "12345"
+    }
+    
+    userData.getProfileDataById.mockResolvedValue(mockProfileData);
+
     const response = await request(app).get('/quote');
     expect(response.statusCode).toBe(200);
   });
@@ -403,14 +465,25 @@ describe('POST /quote', () => {
         zipcode: 77024
       };
 
+      const fuelQuoteHistory = [
+        {
+          gallonsRequested: '1234.00',
+          deliveryAddress: 'delivery address',
+          deliveryDate: '2024-06-15T05:00:00.000Z',
+          suggestedPrice: '1.74',
+          quote: '2147.16'
+        }
+      ]
+
       userData.getProfileDataById.mockResolvedValue(mockProfileData);
+      userData.getFuelQuoteHistoryById.mockResolvedValue(fuelQuoteHistory);
   
-        const response = await request(app)
-            .post('/quote')
-            .send({ gallonsRequested: '3', deliveryDate: '2024-05-07' })
-  
-        expect(userData.getProfileDataById).toHaveBeenCalled();
-        expect(response.statusCode).toBe(200);
+      const response = await request(app)
+          .post('/quote')
+          .send({ gallonsRequested: '3', deliveryDate: '2024-06-07', deliveryAddress: "123 Street"})
+
+      expect(userData.getProfileDataById).toHaveBeenCalled();
+      expect(response.statusCode).toBe(200);
     });
 
     describe('POST /quote/confirm-quote', () => {
@@ -429,7 +502,7 @@ describe('POST /quote', () => {
       
         const response = await request(app)
           .post('/quote/confirm-quote')
-          .send({ gallonsRequested: '3', deliveryDate: '2024-05-23', suggestedPrice:'10.00', totalAmountDue: '30.00' });
+          .send({ gallonsRequested: '3', deliveryDate: '2024-05-23', deliveryAddress: "123 Street", suggestedPrice:'10.00', totalAmountDue: '30.00' });
 
         expect(userData.getProfileDataById).toHaveBeenCalled();
         expect(userData.storeFuelQuote).toHaveBeenCalled();

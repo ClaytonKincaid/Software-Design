@@ -39,8 +39,8 @@ class PricingModule {
 
         const totalMargin = basePrice * (locationFactor - rateHistoryFactor + gallonsRequestedFactor + companyProfitFactor)
 
-        const totalPrice = basePrice + totalMargin
-        return totalPrice
+        const totalPricePerGallon = basePrice + totalMargin
+        return totalPricePerGallon
     }
 
 

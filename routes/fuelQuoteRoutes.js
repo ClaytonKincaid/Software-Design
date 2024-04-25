@@ -40,6 +40,7 @@ router.post('/', checkAuthenticated, checkProfileComplete, validateQuoteFields, 
 
         // Fetch fuel quote history for the user
         const fuelQuoteHistory = await userData.getFuelQuoteHistoryById(req.user.id);
+        console.log(fuelQuoteHistory)
 
         const quoteDetails = {
             userId: req.user.id,
