@@ -10,20 +10,30 @@ const PricingModule = require('../PricingModule')
 const pricingModule = new PricingModule()
 
 // Route to display the fuel quote form
-router.get('/', checkAuthenticated, checkProfileComplete, (req, res) => {
-    res.render('fuelQuoteForm', {
-        gallonsRequested: '',
-        deliveryDate: '',
-        suggestedPrice: '',
-        totalAmountDue: ''
-    })
+router.get('/', checkAuthenticated, checkProfileComplete, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const profileData = await userData.getProfileDataById(userId);
+
+        res.render('fuelQuoteForm', {
+            gallonsRequested: '',
+            deliveryDate: '',
+            deliveryAddress: profileData.address1,
+            suggestedPrice: '',
+            totalAmountDue: ''
+        })
+    } catch (error) {
+        console.error('Error loading fuel quote form:', error);
+        res.status(500).send('Internal Server Error');
+    }
 })
 
 // Route to handle the form submission
 router.post('/', checkAuthenticated, checkProfileComplete, validateQuoteFields, async (req, res) => {
     try {
         // Extract gallonsRequested and deliveryDate from the request body
-        const { gallonsRequested, deliveryDate } = req.body;
+        const { gallonsRequested, deliveryDate, deliveryAddress } = req.body;
 
         // Retrieve additional profile data based on the user ID
         const profileData = await userData.getProfileDataById(req.user.id);
@@ -53,6 +63,7 @@ router.post('/', checkAuthenticated, checkProfileComplete, validateQuoteFields, 
         res.render('fuelQuoteForm', {
             gallonsRequested,
             deliveryDate,
+            deliveryAddress,
             suggestedPrice: suggestedPricePerGallon.toFixed(2), // 2 decimal places
             totalAmountDue: totalAmountDue.toFixed(2) // 2 decimal places
         });
@@ -66,7 +77,7 @@ router.post('/', checkAuthenticated, checkProfileComplete, validateQuoteFields, 
 // Route to handle the confirmation of the quote
 router.post('/confirm-quote', checkAuthenticated, checkProfileComplete, async (req, res) => {
     try {
-        const { gallonsRequested, deliveryDate, suggestedPrice, totalAmountDue } = req.body;
+        const { gallonsRequested, deliveryDate, deliveryAddress, suggestedPrice, totalAmountDue } = req.body;
         
         const profileData = await userData.getProfileDataById(req.user.id);
 
@@ -89,6 +100,7 @@ router.post('/confirm-quote', checkAuthenticated, checkProfileComplete, async (r
         res.render('quoteConfirmation', {
             gallonsRequested,
             deliveryDate,
+            deliveryAddress,
             suggestedPrice,
             totalAmountDue
         })

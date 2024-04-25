@@ -49,6 +49,7 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+
 }
 
 button:hover {
@@ -124,7 +125,7 @@ header a:hover {
 }
 
 .error-message {
-    color: #D8000C; /* red color for text */
+    color: #D8000C; /* red color for error */
     background-color: #FFD2D2; /* Light red background for visibility */
     border: 1px solid #D8000C; /* Border to match text color*/
     padding: 10px;

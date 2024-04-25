@@ -59,7 +59,7 @@ router.post("/", checkAuthenticated, checkProfileComplete, validateProfileInfo, 
         console.log('Zipcode:', zipcode)
         console.log()
 
-        res.redirect('/profile'); // Redirect to home or dashboard after profile completion
+        res.redirect('/profile');
     } catch (error) {
         console.error('Error updating user profile:', error);
         res.status(500).send('Error completing profile');
