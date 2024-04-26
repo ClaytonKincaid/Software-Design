@@ -1,4 +1,4 @@
-CREATE DATABASE main;
+CREATE DATABASE IF NOT EXISTS main;
 USE main;
 
 -- Create UserCredentials for storing client registration information
